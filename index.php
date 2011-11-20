@@ -29,20 +29,32 @@ $compiled_file = CssCrush::file( 'assets/css/main.css', $options );
 </head>
 <body>
 
-
-<header>
+<header role="banner">
+  <nav role="navigation">
+    <ul>
+      <li><a href="#">Page 1</a></li>
+      <li><a href="#">Page 2</a></li>
+      <li><a href="#">Page 3</a></li>
+      <li><a href="#">Page 4</a></li>
+    </ul>
+  </nav>
 </header>
 
-<div id="main" role="main">
-</div>
+<section id="content" role="main">
+  <h1>Main title</h1>
+  <article role="article">
+    <h2>Subtitle</h2>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+  </article>
+</section>
 
-
-
-<footer>
+<aside role="complementary">
+  <h2>Sidebar</h2>
+</aside>
+<footer role="contentinfo">
+  <p>&copy; <?php echo date("Y"); ?></p>
 </footer>
-
 <?php include "includes/ie6warning.php"; // warn ie6 users that they must upgrade or face nuclear war ?>
-
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
 <?php if (strtolower(getenv('browser')) . getenv('version') != 'ie6') { // serve main javascript with cache-busting timestamp to all but error-prone IE6 ?>
 <script type="text/javascript" src="/assets/js/site.<?php echo filemtime('/path/to/assets/js/site.js') ?>.js"></script>
@@ -52,19 +64,18 @@ $compiled_file = CssCrush::file( 'assets/css/main.css', $options );
  ===================================================================================
  HTML5 + Media Queries polyfills for IE7 and IE8, excluding IE on mobile devices
  ===================================================================================
- -->
-  
+ --> 
+
 <!--[if (lt IE 9) & (!IEMobile)]>
 <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 <script type="text/javascript" src="/assets/js/respond.js"></script>
-<![endif]-->
-
+<![endif]--> 
 
 <!--   
  ===================================================================================
  Google Analytics code. Remove comments when ready for production
  ===================================================================================
- -->
+ --> 
 
 <!--   
 <script>
