@@ -1,0 +1,230 @@
+# ----------------------------------------------------------------------
+# Browser and OS sniffing
+# Matthew Pennell @ http://www.thewatchmakerproject.com/blog/no-more-css-hacks-browser-sniffing-with-htaccess/
+# ----------------------------------------------------------------------
+
+SetEnvIfNoCase User-Agent (Opera|Chrome|Version|Firefox|MSIE)[\/|\s](\d+)\. browser=$1 version=$2
+SetEnvIfNoCase User-Agent (iPhone|iPod|iPad|Macintosh|Windows|Android|Blackberry) os=$1
+SetEnvIf browser Version browser=Safari
+SetEnvIf browser MSIE browser=IE
+
+
+# ----------------------------------------------------------------------
+# Proper MIME type for all files
+# ----------------------------------------------------------------------
+ 
+ 
+# JavaScript
+#   Normalize to standard type (it's sniffed in IE anyways)
+#   tools.ietf.org/html/rfc4329#section-7.2
+AddType application/javascript         js
+ 
+# Audio
+AddType audio/ogg                      oga ogg
+AddType audio/mp4                      m4a
+ 
+# Video
+AddType video/ogg                      ogv
+AddType video/mp4                      mp4 m4v
+AddType video/webm                     webm
+ 
+# SVG
+#   Required for svg webfonts on iPad
+AddType     image/svg+xml              svg svgz
+AddEncoding gzip                       svgz
+                                       
+# Webfonts                            
+AddType application/vnd.ms-fontobject  eot
+AddType application/x-font-ttf    ttf ttc
+AddType font/opentype                  otf
+AddType application/x-font-woff        woff
+
+# ----------------------------------------------------------------------
+# Caching
+# ----------------------------------------------------------------------
+
+Header unset ETag
+FileETag None
+
+<IfModule mod_expires.c>
+  ExpiresActive on
+
+# Perhaps better to whitelist expires rules? Perhaps.
+  ExpiresDefault                          "access plus 1 week"
+
+# cache.appcache needs re-requests in FF 3.6
+  ExpiresByType text/cache-manifest       "access plus 0 seconds"
+
+# Your document html 
+  ExpiresByType text/html                 "access plus 0 seconds"
+  
+# Data
+  ExpiresByType text/xml                  "access plus 0 seconds"
+  ExpiresByType application/xml           "access plus 0 seconds"
+  ExpiresByType application/json          "access plus 0 seconds"
+
+# RSS feed
+  ExpiresByType application/rss+xml       "access plus 1 hour"
+
+# Favicon (cannot be renamed)
+  ExpiresByType image/x-icon              "access plus 1 week" 
+
+# Media: images, video, audio
+  ExpiresByType image/gif                 "access plus 1 week"
+  ExpiresByType image/png                 "access plus 1 week"
+  ExpiresByType image/jpg                 "access plus 1 week"
+  ExpiresByType image/jpeg                "access plus 1 week"
+  ExpiresByType video/ogg                 "access plus 1 week"
+  ExpiresByType audio/ogg                 "access plus 1 week"
+  ExpiresByType video/mp4                 "access plus 1 week"
+  ExpiresByType video/webm                "access plus 1 week"
+  
+# HTC files  (css3pie)
+  ExpiresByType text/x-component          "access plus 1 month"
+  
+# Webfonts
+  ExpiresByType font/truetype             "access plus 1 month"
+  ExpiresByType font/opentype             "access plus 1 month"
+  ExpiresByType application/x-font-woff   "access plus 1 month"
+  ExpiresByType image/svg+xml             "access plus 1 month"
+  ExpiresByType application/vnd.ms-fontobject "access plus 1 month"
+    
+# CSS and JavaScript
+  ExpiresByType text/css                  "access plus 1 month"
+  ExpiresByType application/javascript    "access plus 1 hour"
+  ExpiresByType text/javascript           "access plus 1 hour"
+  
+  <IfModule mod_headers.c>
+    Header append Cache-Control "public"
+  </IfModule>
+  
+</IfModule>
+
+
+# ----------------------------------------------------------------------
+# Rewrite rules
+# ----------------------------------------------------------------------
+
+Options +FollowSymLinks
+RewriteEngine on
+RewriteBase /
+
+# Remove "www"
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
+
+# Add trailing slash
+RewriteCond %{REQUEST_URI} !/$
+RewriteCond %{REQUEST_URI} !\.
+RewriteRule (.*) $1/ [R=301,L]
+
+# RewriteRule ^(.*)/print/$ page.php?name=$1&q=print [L]
+# RewriteRule ^(.*)/$ page.php?name=$1 [L]
+# DirectoryIndex index.php
+
+# Rewrite timestamped version of css and js files to the actual filenames
+# See http://www.electrictoolbox.com/force-reload-css-javascript-unique-filenames/
+RewriteRule ^assets/css/(.*)\.[0-9]+\.css assets/css/$1.css [L]
+RewriteRule ^assets/js/site.[0-9]+.js assets/js/site.js [L]
+
+# ----------------------------------------------------------------------
+# Gzip compression
+# ----------------------------------------------------------------------
+
+<FilesMatch "\.(js|css|html|htm|php)$">
+SetOutputFilter DEFLATE
+</FilesMatch>
+
+
+
+# ----------------------------------------------------------------------
+# UTF-8 encoding
+# ----------------------------------------------------------------------
+
+# Use UTF-8 encoding for anything served text/plain or text/html
+AddDefaultCharset utf-8
+
+# Force UTF-8 for a number of file formats
+AddCharset utf-8 .html .css .js .xml .json .rss
+
+
+
+# ----------------------------------------------------------------------
+# A little more security
+# ----------------------------------------------------------------------
+
+# "-Indexes" will have Apache block users from browsing folders without a default document
+# Usually you should leave this activated, because you shouldn't allow everybody to surf through
+# every folder on your server (which includes rather private places like CMS system folders).
+Options -Indexes
+
+# Do not show you are using php
+php_flag expose_php Off
+
+# Do not display errors in browser (production - Off, development - On)
+php_flag display_errors Off
+
+# Do not display startup errors (production - Off, development - On)
+php_flag display_startup_errors Off
+
+# Increase cookie security
+<IfModule php5_module>
+	php_value session.cookie_httponly true
+</IfModule>
+
+
+# ----------------------------------------------------------------------
+# A lot more security
+# ----------------------------------------------------------------------
+
+# 5G FIREWALL from PerishablePress.com
+ RewriteCond %{QUERY_STRING} (environ|localhost|mosconfig|scanner) [NC,OR]
+ RewriteCond %{QUERY_STRING} (menu|mod|path|tag)\=\.?/? [NC,OR]
+ RewriteCond %{QUERY_STRING} boot\.ini  [NC,OR]
+ RewriteCond %{QUERY_STRING} echo.*kae  [NC,OR]
+ RewriteCond %{QUERY_STRING} etc/passwd [NC,OR]
+ RewriteCond %{QUERY_STRING} \=\\%27$   [NC,OR]
+ RewriteCond %{QUERY_STRING} \=\\\'$    [NC,OR]
+ RewriteCond %{QUERY_STRING} \.\./      [NC,OR]
+ RewriteCond %{QUERY_STRING} \:         [NC,OR]
+ RewriteCond %{QUERY_STRING} \[         [NC,OR]
+ RewriteCond %{QUERY_STRING} \]         [NC]
+ RewriteRule .* - [F]
+
+
+# 5G:[USER AGENTS]
+<IfModule mod_setenvif.c>
+ SetEnvIfNoCase User-Agent ^$ keep_out
+ SetEnvIfNoCase User-Agent (casper|cmsworldmap|diavol|dotbot)   keep_out
+ SetEnvIfNoCase User-Agent (flicky|ia_archiver|jakarta|kmccrew) keep_out
+ SetEnvIfNoCase User-Agent (libwww|planetwork|pycurl|skygrid)   keep_out
+ <Limit GET POST PUT>
+  Order Allow,Deny
+  Allow from all
+  Deny from env=keep_out
+ </Limit>
+</IfModule>
+
+# 5G:[REQUEST STRINGS]
+<IfModule mod_alias.c>
+ RedirectMatch 403 (https?|ftp|php)\://
+ RedirectMatch 403 /(cgi|https?|ima|ucp)/
+ RedirectMatch 403 (\=\\\'|\=\\%27|/\\\'/?|\)\.css\()$
+ RedirectMatch 403 (\,|//|\)\+|/\,/|\{0\}|\(/\(|\.\.\.|\+\+\+|\|)
+ RedirectMatch 403 \.(cgi|asp|aspx|cfg|dll|exe|jsp|mdb|sql|ini|rar)$
+ RedirectMatch 403 /(contac|fpw|install|pingserver|register)\.php
+ RedirectMatch 403 (base64|crossdomain|localhost|wwwroot)
+ RedirectMatch 403 (eval\(|\_vti\_|\(null\)|echo.*kae)
+ RedirectMatch 403 \.well\-known/host\-meta
+ RedirectMatch 403 /function\.array\-rand
+ RedirectMatch 403 \)\;\$\(this\)\.html\(
+ RedirectMatch 403 proc/self/environ
+ RedirectMatch 403 msnbot\.htm\)\.\_
+ RedirectMatch 403 /ref\.outcontrol
+ RedirectMatch 403 com\_cropimage
+ RedirectMatch 403 indonesia\.htm
+ RedirectMatch 403 \{\$itemURL\}
+ RedirectMatch 403 function\(\)
+ RedirectMatch 403 labels\.rdf
+</IfModule>
