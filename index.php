@@ -11,7 +11,7 @@ $compiled_file = CssCrush::file( 'assets/css/main.css', $options );
 ?>
 <!doctype html>
 <html lang="es" class="<?php echo strtolower(getenv('browser')) . getenv('version'); ?> <?php echo strtolower(getenv('browser')); ?> <?php echo strtolower(getenv('os'));
-// browser and os detection classes generated through .htaccess file, used mainly to target our good friend IE in CSS ?>">
+// browser and os detection classes generated through .htaccess file, used mainly to target our good friend IE in CSS and avoid those ugly conditional comments as used on HTML5 boilerplate ?>">
 <head>
 <meta charset="utf-8">
 <meta name="description" content="">
@@ -51,10 +51,13 @@ $compiled_file = CssCrush::file( 'assets/css/main.css', $options );
 <aside role="complementary">
   <h2>Sidebar</h2>
 </aside>
+
 <footer role="contentinfo">
   <p>&copy; <?php echo date("Y"); ?></p>
 </footer>
+
 <?php include "includes/ie6warning.php"; // warn ie6 users that they must upgrade or face nuclear war ?>
+
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <?php if (strtolower(getenv('browser')) . getenv('version') != 'ie6') { // serve main javascript with cache-busting timestamp to all but error-prone IE6 ?>
 <script type="text/javascript" src="/assets/js/site.<?php echo filemtime('/path/to/assets/js/site.js') ?>.js"></script>

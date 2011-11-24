@@ -1,0 +1,152 @@
+
+/*------------------------------------*\
+	INSPIRATION:
+	http://coding.smashingmagazine.com/2011/11/24/how-to-set-up-a-print-style-sheet/
+	https://github.com/csswizardry/inuit.css/
+	https://github.com/malarkey/320andup/
+\*------------------------------------*/
+
+* {
+	background: transparent !important;
+	color: black !important;
+	text-shadow: none !important;
+	filter: none !important;
+	-ms-filter: none !important;
+}
+
+@page {
+	margin: 0.5cm;
+}
+
+p {
+	orphans: 3;
+	widows: 3;
+}
+
+pre, blockquote {
+	border-left: 2px solid #999;
+	page-break-inside: avoid;
+}
+
+.message {
+	border: none;
+	font-weight: bold;
+}
+
+abbr[title]:after {
+	content: " (" attr(title) ")";
+}
+
+a, a:visited {
+	color: #444 !important;
+	text-decoration: underline;
+}
+
+thead {
+	display: table-header-group;
+}
+
+tr {
+	page-break-inside: avoid;
+}
+
+
+/*------------------------------------*\
+	TYPOGRAPHY
+\*------------------------------------*/
+
+
+body {
+	font: 12pt Georgia, "Times New Roman", Times, serif;
+	line-height: 1.3;
+}
+
+h2, h3 {
+	orphans : 3;
+	widows : 3;
+	page-break-after : avoid;
+}
+
+h1 {
+	font-size: 24pt;
+}
+
+h2 {
+	font-size: 14pt;
+	margin-top: 25px;
+}
+
+aside h2 {
+	font-size: 18pt;
+}
+
+
+/*------------------------------------*\
+	DON'T PRINT
+\*------------------------------------*/
+
+header nav {
+	display:none;
+}
+
+
+
+/*------------------------------------*\
+	LINKS
+\*------------------------------------*/
+
+/* Display the href of any links */
+a[href]:after {
+	content : " (" attr(href) ")";
+	font-size:smaller;
+}
+
+/* But not javascript, anchors and image replacement links */
+a[href^="javascript:"]:after, a[href^="#"]:after, .ir a:after {
+	content : "";
+}
+
+/* Any links that are root relative to your site need prepending with your URL */
+a[href^="/"]:after {
+	content:" (http://yoururlhere.com" attr(href) ")";
+	font-size:smaller;
+}
+
+
+
+/*------------------------------------*\
+	IMAGES AND VIDEOS
+\*------------------------------------*/
+
+
+img {
+	max-width : 100% !important;
+	height:auto;
+	page-break-inside : avoid;
+	border:0;
+}
+
+/* Flash/video content can’t be printed so leave a message */
+object:after {
+	content:"Flash/video content. Head to http://yoururlhere.com/ to view this content.";
+	display:block;
+	font-weight:bold;
+	margin-bottom:1.5em;
+}
+
+.logo img {
+	position:static;
+}
+
+
+
+/*------------------------------------*\
+	GRID - optional
+	In the following example, linearize inuit.css grids
+	https://github.com/csswizardry/inuit.css
+\*------------------------------------*/
+
+/* 
+.grids {width:auto}
+[class^="grid-"] {width:auto;float:none;clear:both}
+*/
