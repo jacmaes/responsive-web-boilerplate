@@ -107,7 +107,7 @@ FileETag None
 
 Options +FollowSymLinks
 RewriteEngine on
-RewriteBase /
+RewriteBase /dev/responsive-boilerplate/
 
 # Remove "www"
 RewriteCond %{HTTPS} !=on
@@ -162,15 +162,12 @@ Options -Indexes
 # Do not show you are using php
 php_flag expose_php Off
 
-# Do not display errors in browser (production - Off, development - On)
-php_flag display_errors Off
-
 # Do not display startup errors (production - Off, development - On)
 php_flag display_startup_errors Off
 
 # Increase cookie security
 <IfModule php5_module>
-	php_value session.cookie_httponly true
+  php_value session.cookie_httponly true
 </IfModule>
 
 
