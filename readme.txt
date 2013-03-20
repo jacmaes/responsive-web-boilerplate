@@ -1,5 +1,5 @@
 Author: Jacques Maes
-Version: 0.1
+Version: 0.2
 Company: Arqyestudio, S.C.
 Website: www.arqyestudio.com
 
