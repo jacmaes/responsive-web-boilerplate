@@ -12,40 +12,53 @@
  *     background: rgba(0,0,0,.5);
  */
 
-CssCrush_Hook::add( 'rule_postalias', 'csscrush_rgba' );
+CssCrush_Plugin::register( 'rgba-fallback', array(
+    'enable' => 'csscrush__enable_rgba_fallback',
+    'disable' => 'csscrush__disable_rgba_fallback',
+));
 
-function csscrush_rgba ( CssCrush_Rule $rule ) {
-	$props = array_keys( $rule->properties );
+function csscrush__enable_rgba_fallback () {
+    CssCrush_Hook::add( 'rule_postalias', 'csscrush__rgba_fallback' );
+}
 
-	// Determine which properties apply
-	$rgba_props = array();
-	foreach ( $props as $prop ) {
-		if ( $prop === 'background' or strpos( $prop, 'color' ) !== false ) {
-			$rgba_props[] = $prop;
-		}
-	}
-	if ( empty( $rgba_props ) ) {
-		return;
-	}
+function csscrush__disable_rgba_fallback () {
+    CssCrush_Hook::remove( 'rule_postalias', 'csscrush__rgba_fallback' );
+}
 
-	$new_set = array();
-	foreach ( $rule as $declaration ) {
-		$is_viable = in_array( $declaration->property, $rgba_props );
-		if ( 
-			!$is_viable or 
-			$is_viable and !preg_match( '!^rgba___p\d+___$!', $declaration->value )
-		) {
-			$new_set[] = $declaration;
-			continue;
-		}
-		// Create rgb value from rgba
-		$raw_value = $rule->getDeclarationValue( $declaration );
-		$raw_value = substr( $raw_value, 5, strlen( $raw_value ) - 1 );
-		list( $r, $g, $b, $a ) = explode( ',', $raw_value );
-		
-		// Add rgb value to the stack, followed by rgba 
-		$new_set[] = $rule->createDeclaration( $declaration->property, "rgb($r,$g,$b)" );
-		$new_set[] = $declaration;
-	}
-	$rule->declarations = $new_set;
+function csscrush__rgba_fallback ( CssCrush_Rule $rule ) {
+
+    $props = array_keys( $rule->properties );
+
+    // Determine which properties apply
+    $rgba_props = array();
+    foreach ( $props as $prop ) {
+        if ( $prop === 'background' || strpos( $prop, 'color' ) !== false ) {
+            $rgba_props[] = $prop;
+        }
+    }
+    if ( empty( $rgba_props ) ) {
+        return;
+    }
+
+    $new_set = array();
+    foreach ( $rule as $declaration ) {
+        $is_viable = in_array( $declaration->property, $rgba_props );
+        if ( 
+            $declaration->skip ||
+            ! $is_viable || 
+            $is_viable && !preg_match( '!^rgba\?p\d+\?$!', $declaration->value )
+        ) {
+            $new_set[] = $declaration;
+            continue;
+        }
+        // Create rgb value from rgba
+        $raw_value = $declaration->getFullValue();
+        $raw_value = substr( $raw_value, 5, strlen( $raw_value ) - 1 );
+        list( $r, $g, $b, $a ) = explode( ',', $raw_value );
+        
+        // Add rgb value to the stack, followed by rgba 
+        $new_set[] = new CssCrush_Declaration( $declaration->property, "rgb($r,$g,$b)" );
+        $new_set[] = $declaration;
+    }
+    $rule->setDeclarations( $new_set );
 }

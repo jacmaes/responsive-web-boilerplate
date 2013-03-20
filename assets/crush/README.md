@@ -1,5 +1,5 @@
 CSS Crush
-=====
+===================================
 
 CSS Crush is an extensible PHP based CSS preprocessor that aims to alleviate many of the hacks and workarounds necessary in modern CSS development.
 
@@ -13,14 +13,16 @@ http://the-echoplex.net/csscrush
 Quick start
 ===================================
 
-    <?php
-    
-    require_once 'CssCrush/CssCrush.php';
-    $global_css = CssCrush::file( '/css/global.css' );
-    
-    ?>
-    
-    <link rel="stylesheet" type="text/css" href="<?php echo $global_css; ?>" />
+```php
+<?php
+
+require_once 'CssCrush/CssCrush.php';
+$global_css = csscrush_file( '/css/global.css' );
+
+?>
+
+<link rel="stylesheet" href="<?php echo $global_css; ?>" media="all" />
+```
 
 
 Submitting bugs

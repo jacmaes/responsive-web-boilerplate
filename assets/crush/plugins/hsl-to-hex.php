@@ -10,20 +10,30 @@
  *    color: #6abf40
  */
 
-CssCrush_Hook::add( 'rule_postalias', 'csscrush_hsl' );
+CssCrush_Plugin::register( 'hsl-to-hex', array(
+    'enable' => 'csscrush__enable_hsl_to_hex',
+    'disable' => 'csscrush__disable_hsl_to_hex',
+));
 
-function csscrush_hsl ( CssCrush_Rule $rule ) {
-	foreach ( $rule as &$declaration ) {
-		if ( !empty( $declaration->functions ) and in_array( 'hsl', $declaration->functions ) ) {
-			while ( preg_match( '!hsl(___p\d+___)!', $declaration->value, $m ) ) {
-				$full_match = $m[0];
-				$token = $m[1];
-				$hsl = trim( $rule->parens[ $token ], '()' );
-				$hsl = array_map( 'trim', explode( ',', $hsl ) );
-				$rgb = CssCrush_Color::cssHslToRgb( $hsl );
-				$hex = CssCrush_Color::rgbToHex( $rgb );
-				$declaration->value = str_replace( $full_match, $hex, $declaration->value );
-			}
-		}
-	}
+function csscrush__enable_hsl_to_hex () {
+    CssCrush_Hook::add( 'rule_postalias', 'csscrush__hsl_to_hex' );
+}
+
+function csscrush__disable_hsl_to_hex () {
+    CssCrush_Hook::remove( 'rule_postalias', 'csscrush__hsl_to_hex' );
+}
+
+function csscrush__hsl_to_hex ( CssCrush_Rule $rule ) {
+
+    foreach ( $rule as &$declaration ) {
+
+        if ( ! $declaration->skip && isset( $declaration->functions[ 'hsl' ] ) ) {
+            while ( preg_match( '!hsl(\?p\d+\?)!', $declaration->value, $m ) ) {
+                $token = $m[1];
+                $color = new CssCrush_Color( 'hsl' . CssCrush::$process->fetchToken( $token ) );
+                CssCrush::$process->releaseToken( $token );
+                $declaration->value = str_replace( $m[0], $color->getHex(), $declaration->value );
+            }
+        }
+    }
 }

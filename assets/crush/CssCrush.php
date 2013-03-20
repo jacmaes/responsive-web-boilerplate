@@ -1,38 +1,26 @@
 <?php
 /**
- *
- * CSS Crush
- * Extensible CSS preprocessor
- * 
- * @version    1.3.6
- * @license    http://www.opensource.org/licenses/mit-license.php (MIT)
- * @copyright  Copyright 2010-2011 Pete Boere
- * 
- * @example
- * <?php
- *
- * // Basic usage
- * require_once 'CssCrush.php';
- * $global_css = CssCrush::file( '/css/global.css' );
- *
- * ?>
- *
- * <link rel="stylesheet" href="<?php echo $global_css; ?>" />
- *
- */
+  *
+  * Bootstrap file with autoloader.
+  *
+  */
+function csscrush_autoload ( $class ) {
 
-require_once 'lib/Core.php';
-CssCrush::init( dirname( __FILE__ ) );
+    // Only autoload classes with the library prefix.
+    if ( stripos( $class, 'csscrush' ) !== 0 ) {
+        return;
+    }
 
-require_once 'lib/Rule.php';
+    // Tolerate some cases of lowercasing.
+    $class = str_ireplace( 'csscrush', 'CssCrush', $class );
+    $subpath = implode( '/', array_map( 'ucfirst', explode( '_', $class ) ) );
 
-require_once 'lib/Function.php';
-CssCrush_Function::init();
+    require_once dirname( __FILE__ ) . "/lib/$subpath.php";
+}
 
-require_once 'lib/Importer.php';
-require_once 'lib/Color.php';
-require_once 'lib/Hook.php';
+spl_autoload_register( 'csscrush_autoload' );
 
 
-
-
+// Core.php will also be autoloaded with API changes in v2.x.
+require_once 'lib/CssCrush/Core.php';
+require_once 'lib/functions.php';
