@@ -1,23 +1,18 @@
 <?php 
 
-/*=============================================
-     =       CSS preprocessor        =
-
+/*======  CSS PREPROCESSOR
 include CSS Crush, the wonderful PHP-based CSS
-preprocessor available here: 
-http://the-echoplex.net/csscrush/
+preprocessor: http://the-echoplex.net/csscrush/
 =============================================*/
 require_once 'assets/crush/CssCrush.php'; 
 $options = array(
   'versioning' => true,
-  'boilerplate' => true,
+  'boilerplate' => true, // include a boilerplate automatically ("CssCrush.boilerplate" in the "crush" folder) 
 	'debug' => false, // set it to true to view unminified css and debug in Web Inspector
-);
-$compiled_file = CssCrush::file( 'assets/css/main.css', $options );
+  );
+$compiled_file = csscrush_file( '/assets/css/main.css', $options ); // make sure the "css" directory is writable
 
-/*=============================================
-        =            RESS            =
-
+/*======= RESS
 include RESS components to optionally serve
 different code depending on device width and type
 =============================================*/
@@ -31,12 +26,13 @@ include './includes/ress.php';
 <meta charset="utf-8">
 <meta name="description" content="">
 <meta name="keywords" content="">
-<title></title>
+<title>Page title | Firm name</title>
 <meta http-equiv="cleartype" content="on">
 <meta name="HandheldFriendly" content="True">
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<?php if ($fullbrowser != 'ie6') { // serve main css file compiled and minified by CSS Crush to all but IE6. Extra CSS files are imported automatically in main CSS file with @import ?>
+<?php // === serve main css file compiled and minified by CSS Crush to all but IE6. Extra CSS files are imported automatically in main CSS file with @import === 
+if ($fullbrowser != 'ie6') { ?>
 <link rel="stylesheet" href="<?php echo $compiled_file; ?>" media="screen, projection">
 <?php } else { // serve universal stylesheet for IE6 ?>
 <link rel="stylesheet" href="http://universal-ie6-css.googlecode.com/files/ie6.1.1.css" media="screen, projection">
@@ -59,54 +55,47 @@ include './includes/ress.php';
   <h1>Main title</h1>
   <article role="article">
     <h2>Subtitle</h2>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+      <p>Browser width: <?= $width; ?>px.</p>
+      <p>
+        <?php if ($width < 500) { ?>
+        This is the small version.
+        <?php } else if ($width < 800) { ?>
+        This is the medium version.
+        <?php } else if ($width < 1024) { ?>
+        This is the large version.
+        <?php } else { ?>
+        This is the extra large version.
+        <?php } ?>
+      </p>
   </article>
 </section>
 
 <aside role="complementary">
   <h2>Sidebar</h2>
+  <p>This is sidebar text.</p>
 </aside>
 
 <footer role="contentinfo">
-  <p>&copy; <?php echo date("Y"); ?></p>
+  <p>&copy; <?php echo date("Y"); ?> &ndash; Footer</p>
 </footer>
 
-<?php include "includes/ie6warning.php"; // warn ie6 users that they must upgrade or face nuclear war ?>
+<?php // === Warn ie6 + ie7 users that they must upgrade or face nuclear war ===
+include "includes/ie_warning.php"; ?>
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<!-- Google-hosted jQuery fallback to CloudFlare -->
 <script>window.jQuery || document.write('<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"><\/script>');</script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <?php if ($fullbrowser != 'ie6') { // serve main javascript with cache-busting timestamp to all but error-prone IE6 ?>
-<script type="text/javascript" src="/assets/js/site.<?php echo filemtime('/path/to/assets/js/site.js') ?>.js"></script>
+<script src="/assets/js/site.<?php echo filemtime('/path/to/assets/js/site.js') ?>.js"></script>
 <?php } ?>
 
-<!--
- ===================================================================================
- HTML5 + Media Queries polyfills for IE7 and IE8, excluding IE on mobile devices
- ===================================================================================
- --> 
 
-<!--[if (lt IE 9) & (!IEMobile)]>
+<?php // === HTML5 + Media Queries polyfills for old IE ===
+if (($fullbrowser == 'ie6') OR ($fullbrowser == 'ie7') OR ($fullbrowser == 'ie8')) {  ?>
 <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 <script type="text/javascript" src="/assets/js/respond.js"></script>
-<![endif]--> 
+<?php } ?>
 
-<!--   
- ===================================================================================
- Google Analytics code. Remove comments when ready for production
- ===================================================================================
- --> 
-
-<!--   
-<script>
-var _gaq = _gaq || [];_gaq.push(['_setAccount', 'UA-XXXXXX']);_gaq.push(['_trackPageview']);_gaq.push(['_trackPageLoadTime']);
-(function() {
-var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
-})();
-</script>
--->
+<?php // === Google Analytics ===
+      // include "includes/google_analytics.php"; ?>
 </body>
 </html>
