@@ -2,7 +2,7 @@
 
 // 1. basic browser and os detection generated through .htaccess file, used mainly to target our good old friend IE in CSS and avoid those ugly conditional comments as used on HTML5 boilerplate
 
-$browser = strtolower(getenv('browser'))
+$browser = strtolower(getenv('browser'));
 $fullbrowser = $browser . getenv('version');
 $os = strtolower(getenv('os'));
 
