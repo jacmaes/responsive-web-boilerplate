@@ -1,17 +1,32 @@
 <?php 
-// include CSS Crush, the PHP-based CSS preprocessor available here: http://the-echoplex.net/csscrush/
+
+/*=============================================
+     =       CSS preprocessor        =
+
+include CSS Crush, the wonderful PHP-based CSS
+preprocessor available here: 
+http://the-echoplex.net/csscrush/
+=============================================*/
 require_once 'assets/crush/CssCrush.php'; 
 $options = array(
-    'versioning' => true,
-	'boilerplate' => true,
+  'versioning' => true,
+  'boilerplate' => true,
 	'debug' => false, // set it to true to view unminified css and debug in Web Inspector
 );
-// you might have to chmod your css directory to allow CSS Crush to write the compiled file correctly
 $compiled_file = CssCrush::file( 'assets/css/main.css', $options );
+
+/*=============================================
+        =            RESS            =
+
+include RESS components to optionally serve
+different code depending on device width and type
+=============================================*/
+include './includes/mobile_detect.php';
+include './includes/ress.php';
+
 ?>
 <!doctype html>
-<html lang="es" class="<?php echo strtolower(getenv('browser')) . getenv('version'); ?> <?php echo strtolower(getenv('browser')); ?> <?php echo strtolower(getenv('os'));
-// browser and os detection classes generated through .htaccess file, used mainly to target our good friend IE in CSS and avoid those ugly conditional comments as used on HTML5 boilerplate ?>">
+<html lang="es" class="<?= $deviceType . " res-" . $width . " " . $browser . " " . $fullbrowser . " " . $os; ?>">
 <head>
 <meta charset="utf-8">
 <meta name="description" content="">
@@ -21,7 +36,7 @@ $compiled_file = CssCrush::file( 'assets/css/main.css', $options );
 <meta name="HandheldFriendly" content="True">
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<?php if (strtolower(getenv('browser')) . getenv('version') != 'ie6') { // serve main css file compiled and minified by CSS Crush to all but IE6. Extra CSS files are imported automatically in main CSS file with @import ?>
+<?php if ($fullbrowser != 'ie6') { // serve main css file compiled and minified by CSS Crush to all but IE6. Extra CSS files are imported automatically in main CSS file with @import ?>
 <link rel="stylesheet" href="<?php echo $compiled_file; ?>" media="screen, projection">
 <?php } else { // serve universal stylesheet for IE6 ?>
 <link rel="stylesheet" href="http://universal-ie6-css.googlecode.com/files/ie6.1.1.css" media="screen, projection">
@@ -60,9 +75,9 @@ $compiled_file = CssCrush::file( 'assets/css/main.css', $options );
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <!-- Google-hosted jQuery fallback to CloudFlare -->
-  <script>window.jQuery || document.write('<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"><\/script>');</script>
+<script>window.jQuery || document.write('<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"><\/script>');</script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<?php if (strtolower(getenv('browser')) . getenv('version') != 'ie6') { // serve main javascript with cache-busting timestamp to all but error-prone IE6 ?>
+<?php if ($fullbrowser != 'ie6') { // serve main javascript with cache-busting timestamp to all but error-prone IE6 ?>
 <script type="text/javascript" src="/assets/js/site.<?php echo filemtime('/path/to/assets/js/site.js') ?>.js"></script>
 <?php } ?>
 
