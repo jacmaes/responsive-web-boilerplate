@@ -126,7 +126,7 @@ $('input, textarea').placeholder();
 /* Open some links in new window if necessary  */
 $('a[rel="external"]').on("click", function(){
 	window.open( $(this).attr('href') );
-	e.preventDefault();
+	return false;
 	});
 
 /* Scroll back to top  */
